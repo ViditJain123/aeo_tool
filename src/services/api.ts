@@ -22,7 +22,7 @@ class ApiService {
 
     this.axiosInstance = axios.create({
       baseURL,
-      timeout: 30000, // 30 seconds timeout
+      timeout: 300000, // 30 seconds timeout
       headers: {
         'Content-Type': 'application/json',
       },
@@ -51,10 +51,7 @@ class ApiService {
       (response: AxiosResponse) => {
         // Log successful responses in development
         if (process.env.NODE_ENV === 'development') {
-          console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-            status: response.status,
-            data: response.data,
-          });
+          console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`);
         }
         return response;
       },
@@ -85,14 +82,10 @@ class ApiService {
   }
 
   // Generic request method
-  private async request<T = unknown>(config: AxiosRequestConfig): Promise<T> {
+  private async request<T = unknown>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.request<ApiResponse<T>>(config);
-      // Handle both wrapped and unwrapped responses
-      if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-        return response.data.data as T;
-      }
-      return response.data as T;
+      return response.data;
     } catch (error) {
       throw this.transformError(error as AxiosError);
     }
@@ -122,23 +115,23 @@ class ApiService {
   }
 
   // HTTP Methods
-  async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, method: 'GET', url });
   }
 
-  async post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  async post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, method: 'POST', url, data });
   }
 
-  async put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  async put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, method: 'PUT', url, data });
   }
 
-  async patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, method: 'PATCH', url, data });
   }
 
-  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, method: 'DELETE', url });
   }
 
@@ -149,7 +142,7 @@ class ApiService {
     fieldName: string = 'file',
     additionalData?: Record<string, unknown>,
     onUploadProgress?: (progressEvent: unknown) => void
-  ): Promise<T> {
+  ): Promise<ApiResponse<T>> {
     const formData = new FormData();
     formData.append(fieldName, file);
 

@@ -5,35 +5,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { APP_CONFIG } from '@/config/app';
-import api from '@/services/api';
+import { useRouter } from 'next/navigation';
+import { useBrandStore } from '@/stores/brandStore';
 
 export default function OnboardingPage() {
   const [brandName, setBrandName] = useState('');
   const [website, setWebsite] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const router = useRouter();
+  const { setBrandName: setStoreBrandName, setWebsite: setStoreWebsite } = useBrandStore();
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     
-    try {
-      // Example API call using the api service
-      const result = await api.post('/onboarding', {
-        brandName,
-        website
-      });
-      
-      console.log('Onboarding successful:', result);
-      // Handle success - maybe redirect to next step
-      
-    } catch (error) {
-      console.error('Onboarding failed:', error);
-      setError('Failed to submit onboarding data. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    // Save to store before navigation
+    setStoreBrandName(brandName);
+    setStoreWebsite(website);
+    
+    router.push(`/callback?action=brandData`);
   };
 
   return (

@@ -3,8 +3,9 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { z } from "zod";
 
+
 const model = new ChatAnthropic({
-    model: "claude-3-5-sonnet-20240620",
+    model: "claude-3-5-haiku-latest",
     temperature: 0
 });
 

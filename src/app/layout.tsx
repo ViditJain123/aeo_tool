@@ -31,11 +31,12 @@ export default function RootLayout({
   const isOnboardingPage = pathname === '/onboarding';
   const isCallbackPage = pathname === '/callback';
   const isLandingPage = pathname === '/';
+  const isOnboardingPromptsPage = pathname === '/onboarding/prompts';
 
-  const showHeader = isOnboardingPage || isCallbackPage || isLandingPage;
+  const showHeader = isOnboardingPage || isCallbackPage || isLandingPage || isOnboardingPromptsPage;
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
